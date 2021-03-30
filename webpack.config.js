@@ -23,6 +23,7 @@ module.exports = {
     filename: '[name].bundle.js',
     chunkFilename: '[id].bundle_[chunkhash].js',
     path: path.resolve(__dirname, 'dist'),
+    publicPath: 'https://lbaker15.github.io/Shaders2/'
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
@@ -59,7 +60,7 @@ module.exports = {
         loader: 'file-loader',
         options: {
           name: '[name].[ext]',
-          outputPath: 'fonts/'
+          outputPath: 'fonts'
         }
       }
     ],
