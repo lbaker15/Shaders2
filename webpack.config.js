@@ -23,7 +23,7 @@ module.exports = {
     filename: '[name].bundle.js',
     chunkFilename: '[id].bundle_[chunkhash].js',
     path: path.resolve(__dirname, 'dist'),
-    publicPath: 'https://lbaker15.github.io/Shaders2/'
+    // publicPath: 'https://lbaker15.github.io/Shaders2/'
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
