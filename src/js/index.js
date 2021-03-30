@@ -1,43 +1,245 @@
 import '/scss/main.scss';
+window.addEventListener('DOMContentLoaded', () => {
+    console.log('loaded')
+})
+
+let segmentSize = document.getElementById('segmentSize');
+let sizeValue = document.getElementById('sizeValue');
+let segmentNumber = document.getElementById('segmentNumber');
+let numberValue = document.getElementById('numberValue');
+let segmentCompression = document.getElementById('segmentCompression');
+let compressionValue = document.getElementById('compressionValue');
+
+
+let s1 = Number(segmentSize.value).toFixed(2);
+let s2 = Number(segmentNumber.value).toFixed(2);
+let s3 = Number(segmentCompression.value).toFixed(2);
+
+segmentSize.addEventListener('change', () => {
+    sizeValue.innerHTML = segmentSize.value;
+    s1 = Number(segmentSize.value).toFixed(2);
+    const frag2 = `
+        #ifdef GL_ES
+        precision highp float;
+        #endif
+
+        #define SEGMENTS 32.0
+        #define PI 3.141592653589
+
+        uniform float u_time;
+        uniform vec2 resolution;
+        uniform vec2 mouse;
+
+        uniform sampler2D image;
+        varying vec2 v_texcoord;
+
+        void main(void)
+        {
+            vec2 uv = v_texcoord;
+            uv *= 2.0;
+            uv -= 1.0;
+            
+            // get the angle and radius
+            float radius = length(uv);
+            float angle = atan(uv.y, uv.x);
+            
+            //get segment
+            angle /= PI * ${s1};
+            angle *= SEGMENTS + ${s2};
+
+            //repeat segment
+            if (mod(angle, 2.0) >= 1.0) {
+                angle = fract(angle);
+            } else {
+                angle = 1.0 - fract(angle);
+            }
+            angle += u_time;
+            
+            //unsquash segment
+            angle /= SEGMENTS;
+            angle *= PI * ${s3};
+            
+            vec2 point = vec2(radius * cos(angle), radius * sin(angle));
+            point = fract(point);
+            
+            vec4 color = texture2D(image, point);
+            gl_FragColor = color;
+        }
+        `
+    sandbox.load(frag2)
+    sandbox.setUniform('displacement', image)
+})
+
+segmentNumber.addEventListener('change', () => {
+    numberValue.innerHTML = Number(segmentNumber.value) + 32;
+    s2 = Number(segmentNumber.value).toFixed(2);
+    console.log(segmentNumber)
+    const frag2 = `
+        #ifdef GL_ES
+        precision highp float;
+        #endif
+
+        #define SEGMENTS 32.0
+        #define PI 3.141592653589
+
+        uniform float u_time;
+        uniform vec2 resolution;
+        uniform vec2 mouse;
+
+        uniform sampler2D image;
+        varying vec2 v_texcoord;
+
+        void main(void)
+        {
+            vec2 uv = v_texcoord;
+            uv *= 2.0;
+            uv -= 1.0;
+            
+            // get the angle and radius
+            float radius = length(uv);
+            float angle = atan(uv.y, uv.x);
+            
+            //get segment
+            angle /= PI * ${s1};
+            angle *= SEGMENTS + ${s2};
+
+            //repeat segment
+            if (mod(angle, 2.0) >= 1.0) {
+                angle = fract(angle);
+            } else {
+                angle = 1.0 - fract(angle);
+            }
+            angle += u_time;
+            
+            //unsquash segment
+            angle /= SEGMENTS;
+            angle *= PI * ${s3};
+            
+            vec2 point = vec2(radius * cos(angle), radius * sin(angle));
+            point = fract(point);
+            
+            vec4 color = texture2D(image, point);
+            gl_FragColor = color;
+        }
+        `
+    sandbox.load(frag2)
+    sandbox.setUniform('displacement', image)
+})
+segmentCompression.addEventListener('change', () => {
+    compressionValue.innerHTML = Number(segmentCompression.value) + 32;
+    s3 = Number(segmentCompression.value).toFixed(2);
+    const frag2 = `
+        #ifdef GL_ES
+        precision highp float;
+        #endif
+
+        #define SEGMENTS 32.0
+        #define PI 3.141592653589
+
+        uniform float u_time;
+        uniform vec2 resolution;
+        uniform vec2 mouse;
+
+        uniform sampler2D image;
+        varying vec2 v_texcoord;
+
+        void main(void)
+        {
+            vec2 uv = v_texcoord;
+            uv *= 2.0;
+            uv -= 1.0;
+            
+            // get the angle and radius
+            float radius = length(uv);
+            float angle = atan(uv.y, uv.x);
+            
+            //get segment
+            angle /= PI * ${s1};
+            angle *= SEGMENTS + ${s2};
+
+            //repeat segment
+            if (mod(angle, 2.0) >= 1.0) {
+                angle = fract(angle);
+            } else {
+                angle = 1.0 - fract(angle);
+            }
+            angle += u_time;
+            
+            //unsquash segment
+            angle /= SEGMENTS;
+            angle *= PI * ${s3};
+            
+            vec2 point = vec2(radius * cos(angle), radius * sin(angle));
+            point = fract(point);
+            
+            vec4 color = texture2D(image, point);
+            gl_FragColor = color;
+        }
+        `
+    sandbox.load(frag2)
+    sandbox.setUniform('displacement', image)
+})
+
+
+
+
+
+
+
+
+
+
+
 const frag = `
 #ifdef GL_ES
 precision highp float;
 #endif
 
+#define SEGMENTS 32.0
+#define PI 3.141592653589
+
 uniform float u_time;
-uniform sampler2D displacement;
+uniform vec2 resolution;
+uniform vec2 mouse;
+
+uniform sampler2D image;
 varying vec2 v_texcoord;
 
-vec4 rgb(float r, float g, float b) {
-    return vec4(r/255.0, g/255.0, b/255.0, 1.0);
-}
-
-void main(void) {
+void main(void)
+{
     vec2 uv = v_texcoord;
+    uv *= 2.0;
+    uv -= 1.0;
     
-    vec2 point = fract(uv* 0.1 + u_time*0.05);
-    vec4 dispColor = texture2D(displacement, point);
+    // get the angle and radius
+    float radius = length(uv);
+    float angle = atan(uv.y, uv.x);
+    
+    //get segment
+    angle /= PI * ${s1};
+    angle *= SEGMENTS;
 
-    vec4 color1 = rgb(255.0, 97.0, 236.0);
-    vec4 color2 = rgb(148.0, 41.0, 255.0);
-    vec4 color3 = rgb(255.0, 216.0, 74.0);
-    vec4 color4 = rgb(20.0, 255.0, 232.0);
+    //repeat segment
+    if (mod(angle, 2.0) >= 1.0) {
+        angle = fract(angle);
+    } else {
+        angle = 1.0 - fract(angle);
+    }
+    angle += u_time;
     
-    float dispY =  mix(-0.5, 0.5, dispColor.r);
-    float dispX = mix(-0.5, 0.5, dispColor.r);
+    //unsquash segment
+    angle /= SEGMENTS;
+    angle *= PI * 2.0;
     
-    vec4 color = mix(
-        mix(color1, color2, uv.x + dispX), 
-        mix(color3, color4, uv.x - dispX), 
-        uv.y + dispY
-    );
+    vec2 point = vec2(radius * cos(angle), radius * sin(angle));
+    point = fract(point);
     
+    vec4 color = texture2D(image, point);
     gl_FragColor = color;
 }
 `
-
 import { Canvas, glsl } from 'glsl-canvas-js';
-import image from '/images/displacement1.jpg';
+import image from '/images/trails.jpg';
 const canvas = document.querySelector('canvas');
 const sandbox = new Canvas(canvas, {
     // vertexString: ``,
@@ -45,3 +247,5 @@ const sandbox = new Canvas(canvas, {
 });
 sandbox.load(frag)
 sandbox.setUniform('displacement', image)
+
+
